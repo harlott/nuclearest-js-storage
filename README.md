@@ -1,4 +1,6 @@
 # nuclearest-js-storage v1.0.0-alpha
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/harlott/nuclearest-js-storage.svg)](https://greenkeeper.io/)
 Smart and flexible Web Storage with fallback strategy 
 
 
