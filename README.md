@@ -1,5 +1,10 @@
 # nuclearest-js-storage v1.0.0-alpha
-Smart and flexible Web Storage with fallback strategy 
+===================
+
+[![Build Status](https://travis-ci.org/harlott/nuclearest-js-storage.svg?branch=devel)](https://travis-ci.org/harlott/nuclearest-js-storage)  [![Coverage Status](https://coveralls.io/repos/github/harlott/nuclearest-js-storage/badge.svg?branch=devel)](https://coveralls.io/github/harlott/nuclearest-js-storage?branch=devel) [![Greenkeeper badge](https://badges.greenkeeper.io/harlott/nuclearest-js-storage.svg)](https://greenkeeper.io/)
+
+
+Smart and flexible Web Storage with fallback strategy from [nuclearest-js](https://github.com/harlott/nuclearest-js) 
 
 
 This is a simple interface for WebStorage. You can create different instances with different localStorage/sessionStorage/cookie and use always the same methods.
@@ -13,26 +18,49 @@ You can also create and use your own.
 
 
  **Warnings**
- In fallback mode, remember to use it only for simple settings, like 'country' or 'lang'. Don't use it to store user settings or sensible infos.
+ In fallback mode, remember to use it only for simple settings. Don't use it to store user settings or sensible infos.
 
 
  Example:
 
- - Use standard browser cookie for authentication data.
- - Please look at the fallbackStorage configuration.
- - With grantedProps, you can set the 'white list' for storage items.
- - If the Browser has cookies disabled, your web application doesn't broke.
- - If Storage try to set not permitted property, will execute callbackOnDisabled().
- - Use callbackOnDisabled() to show a popup, an alert, or do what you think is better for your application
- - In this case, the 'country' item will be setted in the default fallback storage.
- - The 'accessToken' property is not granted, so will be not setted and the application will show an alert.
  - P.S. the default fallback storage is only a global variable: don't use it to store a lot of data.              
 
  ```
-  import Storage, {STORAGE_TYPES} from 'nuclearest-js/Storage'
+  // use cookies 	
+  import Storage, {STORAGE_TYPES} from 'nuclearest-js-storage'
 
   const cookieStorage = new Storage(STORAGE_TYPES.COOKIE, window.cookie, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('COOKIE DISABLED')}})
   cookieStorage.setItem('country', 'IT')
   cookieStorage.setItem('accessToken', 'aaaa-bbbb-cccc-dddd')
 
+  // use sessionStorage 	
+
+  const sessionStorage = new Storage(STORAGE_TYPES.SESSION_STORAGE, window.sessionStorage, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('STORAGE DISABLED')}})
+  sessionStorage.setItem('country', 'IT')
+  sessionStorage.setItem('accessToken', 'aaaa-bbbb-cccc-dddd')
+  
+  //create and use custom
+  
+  import Storage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, STORAGE_TYPES } from 'nuclearest-js-storage'
+  	let __global__ = {}
+    const myStorageType = 'myStorage'
+    const setItem =  (p, v)=>{
+    	__global__[p]=v
+    }
+    const getItem = (p)=>{
+    	return __global__[p]
+    }
+    const removeItem = (p)=>{
+    	__global__[p] = undefined
+    }
+    
+    const myStorage = buildCustomStorage(myStorageType, setItem, getItem, removeItem)
+  	const customStoragesMap = buildCustomStoragesMap(myStorageType, myStorage)
+    let storage = new Storage(myStorageType, undefined, customStoragesMap)
+	cookieStorage.setItem('lang', 'EN')
+
  ```
+ 
+#### Credits
+- [harlott](https://github.com/harlott)
+- [nuclearest-js](https://github.com/harlott/nuclearest-js)
