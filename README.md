@@ -57,7 +57,7 @@ You can also create and use your own.
     const myStorage = buildCustomStorage(myStorageType, setItem, getItem, removeItem)
   	const customStoragesMap = buildCustomStoragesMap(myStorageType, myStorage)
     let storage = new Storage(myStorageType, undefined, customStoragesMap)
-	cookieStorage.setItem('lang', 'EN')
+	storage.setItem('lang', 'EN')
 
  ```
  
