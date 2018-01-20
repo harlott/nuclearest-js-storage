@@ -1,7 +1,7 @@
 # nuclearest-js-storage v1.1.2-alpha
 ===================
 
-[![Build Status](https://travis-ci.org/harlott/nuclearest-js-storage.svg?branch=master)](https://travis-ci.org/harlott/nuclearest-js-storage)  [![Coverage Status](https://coveralls.io/repos/github/harlott/nuclearest-js-storage/badge.svg?branch=master)](https://coveralls.io/github/harlott/nuclearest-js-storage?branch=master) [![Greenkeeper badge](https://badges.greenkeeper.io/harlott/nuclearest-js-storage.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/harlott/nuclearest-js-storage.svg?branch=master)](https://travis-ci.org/harlott/nuclearest-js-storage)  [![Coverage Status](https://coveralls.io/repos/github/harlott/nuclearest-js-storage/badge.svg)](https://coveralls.io/github/harlott/nuclearest-js-storage) [![Greenkeeper badge](https://badges.greenkeeper.io/harlott/nuclearest-js-storage.svg)](https://greenkeeper.io/)
 
 
 Smart and flexible Web Storage with fallback strategy from [nuclearest-js](https://github.com/harlott/nuclearest-js) 
