@@ -1,4 +1,4 @@
-# nuclearest-js-storage v1.0.0-alpha
+# nuclearest-js-storage v1.1.2-alpha
 ===================
 
 [![Build Status](https://travis-ci.org/harlott/nuclearest-js-storage.svg?branch=master)](https://travis-ci.org/harlott/nuclearest-js-storage)  [![Coverage Status](https://coveralls.io/repos/github/harlott/nuclearest-js-storage/badge.svg?branch=master)](https://coveralls.io/github/harlott/nuclearest-js-storage?branch=master) [![Greenkeeper badge](https://badges.greenkeeper.io/harlott/nuclearest-js-storage.svg)](https://greenkeeper.io/)
@@ -29,13 +29,13 @@ You can also create and use your own.
   // use cookies 	
   import Storage, {STORAGE_TYPES} from 'nuclearest-js-storage'
 
-  const cookieStorage = new Storage(STORAGE_TYPES.COOKIE, window.cookie, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('COOKIE DISABLED')}})
+  const cookieStorage = new Storage(STORAGE_TYPES.COOKIE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('COOKIE DISABLED')}})
   cookieStorage.setItem('country', 'IT')
   cookieStorage.setItem('accessToken', 'aaaa-bbbb-cccc-dddd')
 
   // use sessionStorage 	
 
-  const sessionStorage = new Storage(STORAGE_TYPES.SESSION_STORAGE, window.sessionStorage, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('STORAGE DISABLED')}})
+  const sessionStorage = new Storage(STORAGE_TYPES.SESSION_STORAGE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('STORAGE DISABLED')}})
   sessionStorage.setItem('country', 'IT')
   sessionStorage.setItem('accessToken', 'aaaa-bbbb-cccc-dddd')
   
@@ -44,20 +44,20 @@ You can also create and use your own.
   import Storage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, STORAGE_TYPES } from 'nuclearest-js-storage'
   	let __global__ = {}
     const myStorageType = 'myStorage'
-    const setItem =  (p, v)=>{
-    	__global__[p]=v
+    const setItem =  (prop, value)=>{
+    	__global__[prop]=value
     }
-    const getItem = (p)=>{
-    	return __global__[p]
+    const getItem = (prop)=>{
+    	return __global__[prop]
     }
-    const removeItem = (p)=>{
-    	__global__[p] = undefined
+    const removeItem = (prop)=>{
+    	__global__[prop] = undefined
     }
     
     const myStorage = buildCustomStorage(myStorageType, setItem, getItem, removeItem)
   	const customStoragesMap = buildCustomStoragesMap(myStorageType, myStorage)
     let storage = new Storage(myStorageType, undefined, customStoragesMap)
-	storage.setItem('lang', 'EN')
+	  storage.setItem('lang', 'EN')
 
  ```
  
