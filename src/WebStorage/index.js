@@ -1,8 +1,7 @@
 /**
- * Forked from https://github.com/harlott/nuclearest-js
  *
  *
- * Storage
+ * WebStorage
 
  This is a simple interface for WebStorage. You can create different instances with different storage/cookie and use always the same methods. You can also create and use your own.
 
@@ -25,9 +24,9 @@
  - P.S. the default fallback storage is only a global variable: don't use it to store a lot of data.
 
  @example
- import Storage, {STORAGE_TYPES} from 'nuclearest-js/Storage'
+ import Storage, {STORAGE_TYPES} from 'nuclearest-js/WebStorage'
 
- const cookieStorage = new Storage(STORAGE_TYPES.COOKIE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('COOKIE DISABLED')}})
+ const cookieStorage = new WebStorage(STORAGE_TYPES.COOKIE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('COOKIE DISABLED')}})
  cookieStorage.setItem('country', 'IT')
  cookieStorage.setItem('accessToken', 'aaaa-bbbb-cccc-dddd')
 
@@ -190,7 +189,7 @@ export const buildCustomStoragesMap = (storageType, storage) => {
 }
 
 let __storage__fallback__ = {}
-const _internalContext = 'INTERNAL_CONTEXT'
+const _internalContext = 'NODE_CONTEXT'
 const _fallbackStorageType = 'fallbackStorage'
 
 const _defaultSetItem = (p, v) => {
@@ -210,13 +209,21 @@ const _defaultFallbackStorage = buildCustomStorage(_fallbackStorageType, _defaul
 const _defaultFallbackStoragesMap = buildCustomStoragesMap(_fallbackStorageType, _defaultFallbackStorage)
 
 const _getContextByStorageType = (storageType) => {
-    switch (storageType){
-        case STORAGE_TYPES.COOKIE:
-            return document !== undefined ? Object.assign(document) : _internalContext
-        break
-        default:
-            return window !== undefined ? Object.assign(window) : _internalContext
-        break
+    try {
+        switch (storageType){
+            case STORAGE_TYPES.COOKIE:
+                return document !== undefined ? Object.assign(document) : _internalContext
+            break
+            default:
+                return window !== undefined ? Object.assign(window) : _internalContext
+            break
+        }
+    } catch (err){
+        if (!(err instanceof ReferenceError)) {
+            throw err
+        } else {
+            return _internalContext
+        }
     }
 }
 
@@ -238,7 +245,7 @@ class WebStorage {
     constructor(storageType, storagesMap, fallbackStorage) {
         this.STORAGE_TYPE = storageType
         this.CONTEXT = _getContextByStorageType(storageType)
-        this.CAN_USE_STORAGE = canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP)
+        this.CAN_USE_STORAGE = this.CONTEXT !== _internalContext ? canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP) : false
         this.USE_FALLBACK_STORAGE = false
         this.STORAGES_MAP = cloneDeep(storagesMap) || cloneDeep(STORAGES_MAP)
         this.CUSTOM_FALLBACK_STORAGE = cloneDeep(fallbackStorage)

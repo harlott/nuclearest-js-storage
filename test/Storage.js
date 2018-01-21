@@ -1,10 +1,10 @@
-import Storage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, STORAGE_TYPES } from '../src/Storage'
+import WebStorage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, STORAGE_TYPES } from '../src/WebStorage'
 
 const expect = require('chai').expect
 const assert = require('chai').assert
   let __global__ = {}
 
-describe('Storage', function() {
+describe('WebStorage', function() {
   let newStorage = buildCustomStorage('fileSystem', (p, v)=>{__global__[p]=v}, (p)=>{return __global__[p]}, (p)=>{__global__[p] = undefined})
   let customStoragesMap = buildCustomStoragesMap('fileSystem', newStorage)
 
@@ -29,7 +29,7 @@ describe('Storage', function() {
   });
 
   describe('#StorageInstance', function(){
-    let storage = new Storage('fileSystem', undefined, customStoragesMap)
+    let storage = new WebStorage('fileSystem', customStoragesMap)
     it('expect not check custom storage', function(){
       let _testStorage = buildCustomStorage('disabledStorage', (p, v)=>{throw new Error('can not set')}, (p)=>{throw new Error('can not get')}, (p)=>{throw new Error('can not remove')})
       let _testCustomStoragesMap = buildCustomStoragesMap('disabledStorage', newStorage)
@@ -55,7 +55,8 @@ describe('Storage', function() {
         getItem: () => {throw new Error('disabled')},
         removeItem: () => {throw new Error('disabled')}
       }
-      let _storageDisabled = new Storage('STORAGE', _mockedLocalStorage)
+
+      let _storageDisabled = new WebStorage('STORAGE', _mockedLocalStorage)
       try {
           _storageDisabled.setItem('a', 1)
       } catch(err){
