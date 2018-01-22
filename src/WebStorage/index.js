@@ -83,6 +83,7 @@ export const STORAGE_TYPES = {
 
 export const canUseStorage = (storageType, context, customStoragesMap) => {
     let key = 'test'
+    let usedStoragesMap =  customStoragesMap || STORAGES_MAP
     let _storage
     try {
         console.log(`context = ${JSON.stringify(context)}`)
@@ -90,6 +91,7 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
             console.log('NOT EMPTY')
             _storage = storageType === STORAGE_TYPES.COOKIE ? context : context[storageType]
         } else {
+            console.log('EMPTY')
             _storage = get(customStoragesMap, `${storageType}`)
         }
         console.log(`canUseStorage _storage = ${JSON.stringify(_storage)}`)   
@@ -101,9 +103,14 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
             throw error
         }
     }
-    STORAGES_MAP[storageType].setItem(key, '1', undefined, _storage);
-    STORAGES_MAP[storageType].getItem(key, undefined, _storage);
-    STORAGES_MAP[storageType].removeItem(key, undefined, _storage);
+    try {
+        usedStoragesMap[storageType].setItem(key, '1', undefined, _storage);
+        usedStoragesMap[storageType].getItem(key, undefined, _storage);
+        usedStoragesMap[storageType].removeItem(key, undefined, _storage);       
+    } catch(err){
+       throw err     
+    }
+    
     return true
 }
 
@@ -195,6 +202,7 @@ export const buildCustomStoragesMap = (storageType, storage) => {
     let _storage = cloneDeep(storage)
     console.log(`buildCustomStoragesMap _storage = ${JSON.stringify(_storage)}`)
     merge(_storageMap, _storage)
+    console.log(`buildCustomStoragesMap merged storageMap = ${JSON.stringify(_storageMap)}`)
     return _storageMap
 }
 
@@ -222,16 +230,13 @@ const _getContextByStorageType = (storageType) => {
     try {
         switch (storageType){
             case STORAGE_TYPES.COOKIE:
-            console.log('COO')
                 return document !== undefined && !isEmpty(document) ? Object.assign(document) : _internalContext
             break
             default:
-                console.log('DEF')
                 return window !== undefined && !isEmpty(window) ? Object.assign(window) : _internalContext
             break
         }
     } catch (err){
-        console.log('ERR')
         if (!(err instanceof ReferenceError)) {
             throw err
         } else {
