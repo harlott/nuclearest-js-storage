@@ -270,15 +270,21 @@ class WebStorage {
         this.USE_FALLBACK_STORAGE = false
         
         this.CUSTOM_FALLBACK_STORAGE = cloneDeep(fallbackStorage)
-
+        console.log()
         if (this.CAN_USE_STORAGE === false){
             let callbackOnDisabled = get(this.CUSTOM_FALLBACK_STORAGE, 'callbackOnDisabled')
             if (callbackOnDisabled !== undefined){
                 callbackOnDisabled()
             }
         } else {
-            this.STORAGE = this.STORAGE_TYPE === STORAGE_TYPES.COOKIE ? Object.assign(this.CONTEXT) : Object.assign(this.CONTEXT[storageType])
+            if (this.CONTEXT !== undefined && !isEmpty(this.CONTEXT) && this.CONTEXT !== _internalContext){
+                this.STORAGE = this.STORAGE_TYPE === STORAGE_TYPES.COOKIE ? Object.assign(this.CONTEXT) : Object.assign(this.CONTEXT[storageType])
+            } else {
+                console.log('TRY TO SET STORAGE WITH UNDEFINED CONTEXT FROM CUSTOM')
+                this.STORAGE = storagesMap[storageType]
+            }
         }
+
         if (this.CAN_USE_STORAGE === false && (get(this.CUSTOM_FALLBACK_STORAGE, 'enabled') === true) || this.CONTEXT === _internalContext){
             console.log('USE FALLBACK')
             this.USE_FALLBACK_STORAGE = true

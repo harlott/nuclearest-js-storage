@@ -35,7 +35,15 @@ describe('WebStorage', function() {
     it('expect not check custom storage', function(){
       let _testStorage = buildCustomStorage('disabledStorage', (p, v)=>{throw new Error('can not set')}, (p)=>{throw new Error('can not get')}, (p)=>{throw new Error('can not remove')})
       let _testCustomStoragesMap = buildCustomStoragesMap('disabledStorage', _testStorage)
-      expect(canUseStorage('disabledStorage', undefined, _testCustomStoragesMap)).to.be.equal(false)
+      try {
+          let canUse =  canUseStorage('disabledStorage', undefined, _testCustomStoragesMap)
+          assert.ok(false)
+      } catch (err) {
+        assert.ok(true)
+      }
+
+
+
     })
 
     it('expect check custom storage', function(){
@@ -48,7 +56,13 @@ describe('WebStorage', function() {
         getItem: () => {throw new Error('disabled')},
         removeItem: () => {throw new Error('disabled')}
       }
-      expect(canUseStorage('fileSystem', _mockedLocalStorage)).to.be.equal(false)
+      try {
+          let canUse = canUseStorage('fileSystem', undefined, _mockedLocalStorage)
+          assert.ok(false)
+      } catch(err){
+        assert.ok(true)
+      }
+
     })
 
     it('expect not use fallback with standard local storage disabled,no fallbackStorage options and no callbackOnDisabled', function(){
@@ -72,7 +86,7 @@ describe('WebStorage', function() {
         getItem: () => {throw new Error('disabled')},
         removeItem: () => {throw new Error('disabled')}
       }
-      let _storageDisabled = new Storage(STORAGE_TYPES.STORAGE, _mockedLocalStorage, undefined, {'callbackOnDisabled': () => {__global__['callbackOnDisabled'] = true}})
+      let _storageDisabled = new WebStorage(STORAGE_TYPES.LOCAL_STORAGE, _mockedLocalStorage, {'callbackOnDisabled': () => {__global__['callbackOnDisabled'] = true}})
       try {
           _storageDisabled.setItem('a', 1)
       } catch(err){
@@ -87,13 +101,13 @@ describe('WebStorage', function() {
         getItem: () => {throw new Error('disabled')},
         removeItem: () => {throw new Error('disabled')}
       }
-      let _storageDisabled = new Storage('STORAGE', _mockedLocalStorage, undefined, {'grantedProps': ['a']})
+      let _storageDisabled = new WebStorage(STORAGE_TYPES.LOCAL_STORAGE, _mockedLocalStorage, {'grantedProps': ['a']})
       _storageDisabled.setItem('a', 1)
       expect(_storageDisabled.getItem('a')).to.be.a('number')
     })
 
     it('expect get the types map', function(){
-      expect(Storage.getTypesMap()).to.have.all.keys('LOCAL_STORAGE', 'SESSION_STORAGE', 'COOKIE')
+      expect(WebStorage.getTypesMap()).to.have.all.keys('LOCAL_STORAGE', 'SESSION_STORAGE', 'COOKIE')
     })
 
     it('expect add custom storage to Storage instance', function(){
@@ -113,7 +127,7 @@ describe('WebStorage', function() {
         getItem: (p) => {return __global__[p]},
         removeItem: (p) => {}
       }
-      let _storageDisabled = new Storage('STORAGE', _mockedLocalStorage, undefined)
+      let _storageDisabled = new WebStorage(STORAGE_TYPES.LOCAL_STORAGE, _mockedLocalStorage, undefined)
       storage.setItem('a', 1)
       expect(storage.getItem('a')).to.be.a('number')
     })
