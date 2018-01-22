@@ -24,21 +24,21 @@ You can also create and use your own.
 
  ```
   // use cookies 	
-  import Storage, {STORAGE_TYPES} from 'nuclearest-js-storage'
+  import WebStorage, {STORAGE_TYPES} from 'nuclearest-js-storage'
 
-  const cookieStorage = new Storage(STORAGE_TYPES.COOKIE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('COOKIE DISABLED')}})
+  const cookieStorage = new WebStorage(STORAGE_TYPES.COOKIE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('COOKIE DISABLED')}})
   cookieStorage.setItem('country', 'IT')
   cookieStorage.setItem('accessToken', 'aaaa-bbbb-cccc-dddd')
 
   // use sessionStorage 	
 
-  const sessionStorage = new Storage(STORAGE_TYPES.SESSION_STORAGE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('STORAGE DISABLED')}})
+  const sessionStorage = new WebStorage(STORAGE_TYPES.SESSION_STORAGE, undefined, {enabled: true, 'grantedProps':['country'], callbackOnDisabled: () => {alert('STORAGE DISABLED')}})
   sessionStorage.setItem('country', 'IT')
   sessionStorage.setItem('accessToken', 'aaaa-bbbb-cccc-dddd')
   
   //create and use custom
   
-  import Storage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, STORAGE_TYPES } from 'nuclearest-js-storage'
+  import webStorage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, STORAGE_TYPES } from 'nuclearest-js-storage'
   	let __global__ = {}
     const myStorageType = 'myStorage'
     const setItem =  (prop, value)=>{
@@ -53,7 +53,7 @@ You can also create and use your own.
     
     const myStorage = buildCustomStorage(myStorageType, setItem, getItem, removeItem)
   	const customStoragesMap = buildCustomStoragesMap(myStorageType, myStorage)
-    let storage = new Storage(myStorageType, undefined, customStoragesMap)
+    let storage = new WebStorage(myStorageType, undefined, customStoragesMap)
 	  storage.setItem('lang', 'EN')
 
  ```
