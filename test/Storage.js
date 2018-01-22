@@ -28,8 +28,10 @@ describe('WebStorage', function() {
     });
   });
 
+
+
   describe('#StorageInstance', function(){
-    let storage = new WebStorage('fileSystem', customStoragesMap)
+    //let storage = new WebStorage('fileSystem', customStoragesMap)
     it('expect not check custom storage', function(){
       let _testStorage = buildCustomStorage('disabledStorage', (p, v)=>{throw new Error('can not set')}, (p)=>{throw new Error('can not get')}, (p)=>{throw new Error('can not remove')})
       let _testCustomStoragesMap = buildCustomStoragesMap('disabledStorage', newStorage)

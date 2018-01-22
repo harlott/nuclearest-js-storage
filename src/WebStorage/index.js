@@ -33,7 +33,7 @@
  *
  */
 
-import { clone, cloneDeep, merge, get, includes, isObject } from 'lodash'
+import { clone, cloneDeep, merge, get, includes, isObject, isEmpty } from 'lodash'
 
 const _parseToStringToSet = (value) => {
     let parsedValue
@@ -85,7 +85,15 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
     let key = 'test'
     let _storage
     try {
-        _storage = context !== undefined ? storageType === STORAGE_TYPES.COOKIE ? context : context[storageType] : context || customStoragesMap[storageType]
+        console.log(`context = ${JSON.stringify(context)}`)
+        if (context !== undefined || !isEmpty(context)){
+            console.log('NOT EMPTY')
+            _storage = storageType === STORAGE_TYPES.COOKIE ? context : context[storageType]
+        } else {
+            _storage = get(customStoragesMap, `${storageType}`)
+        }
+        console.log(`canUseStorage _storage = ${JSON.stringify(_storage)}`)   
+        console.log(`canUseStorage customStoragesMap[storageType] = ${JSON.stringify(customStoragesMap)}`) 
     } catch (error) {
         if (error instanceof DOMException){
             return false;
@@ -183,7 +191,9 @@ export const buildCustomStorage = (type, setItem, getItem, removeItem) => {
  */
 export const buildCustomStoragesMap = (storageType, storage) => {
     let _storageMap = cloneDeep(STORAGES_MAP)
+    console.log(`buildCustomStoragesMap _storageMap = ${JSON.stringify(_storageMap)}`)
     let _storage = cloneDeep(storage)
+    console.log(`buildCustomStoragesMap _storage = ${JSON.stringify(_storage)}`)
     merge(_storageMap, _storage)
     return _storageMap
 }
@@ -212,13 +222,16 @@ const _getContextByStorageType = (storageType) => {
     try {
         switch (storageType){
             case STORAGE_TYPES.COOKIE:
-                return document !== undefined ? Object.assign(document) : _internalContext
+            console.log('COO')
+                return document !== undefined && !isEmpty(document) ? Object.assign(document) : _internalContext
             break
             default:
-                return window !== undefined ? Object.assign(window) : _internalContext
+                console.log('DEF')
+                return window !== undefined && !isEmpty(window) ? Object.assign(window) : _internalContext
             break
         }
     } catch (err){
+        console.log('ERR')
         if (!(err instanceof ReferenceError)) {
             throw err
         } else {
@@ -243,11 +256,14 @@ class WebStorage {
      *                                        Fallback storage is intended only for static configurations like 'country', 'lang', 'hasAcceptedCookie'...
      */
     constructor(storageType, storagesMap, fallbackStorage) {
+        console.log(`storagesMap = ${JSON.stringify(storagesMap)}`)
         this.STORAGE_TYPE = storageType
         this.CONTEXT = _getContextByStorageType(storageType)
+        console.log(`this.CONTEXT = ${this.CONTEXT}`)
+        this.STORAGES_MAP = cloneDeep(storagesMap) || cloneDeep(STORAGES_MAP)
         this.CAN_USE_STORAGE = this.CONTEXT !== _internalContext ? canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP) : false
         this.USE_FALLBACK_STORAGE = false
-        this.STORAGES_MAP = cloneDeep(storagesMap) || cloneDeep(STORAGES_MAP)
+        
         this.CUSTOM_FALLBACK_STORAGE = cloneDeep(fallbackStorage)
 
         if (this.CAN_USE_STORAGE === false){
@@ -258,7 +274,8 @@ class WebStorage {
         } else {
             this.STORAGE = this.STORAGE_TYPE === STORAGE_TYPES.COOKIE ? Object.assign(this.CONTEXT) : Object.assign(this.CONTEXT[storageType])
         }
-        if (this.CAN_USE_STORAGE === false && get(this.CUSTOM_FALLBACK_STORAGE, 'enabled') === true){
+        if (this.CAN_USE_STORAGE === false && (get(this.CUSTOM_FALLBACK_STORAGE, 'enabled') === true) || this.CONTEXT === _internalContext){
+            console.log('USE FALLBACK')
             this.USE_FALLBACK_STORAGE = true
         }
     }
