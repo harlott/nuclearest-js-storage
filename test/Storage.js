@@ -143,8 +143,5 @@ describe('WebStorage', function() {
       expect(storage.getType()).to.be.equal('fileSystem')
     })
 
-    it('expect get the method', function(){
-      expect(storage.getMethod()).to.deep.be.equal(customStoragesMap.fileSystem)
-    })
   })
 });
