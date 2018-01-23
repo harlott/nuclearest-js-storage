@@ -86,16 +86,11 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
     let usedStoragesMap =  customStoragesMap || STORAGES_MAP
     let _storage
     try {
-        console.log(`context = ${JSON.stringify(context)}`)
         if (context !== undefined || !isEmpty(context)){
-            console.log('NOT EMPTY')
             _storage = storageType === STORAGE_TYPES.COOKIE ? context : context[storageType]
         } else {
-            console.log('EMPTY')
             _storage = get(customStoragesMap, `${storageType}`)
         }
-        console.log(`canUseStorage _storage = ${JSON.stringify(_storage)}`)   
-        console.log(`canUseStorage customStoragesMap[storageType] = ${JSON.stringify(customStoragesMap)}`) 
     } catch (error) {
         if (error instanceof DOMException){
             return false;
@@ -198,11 +193,8 @@ export const buildCustomStorage = (type, setItem, getItem, removeItem) => {
  */
 export const buildCustomStoragesMap = (storageType, storage) => {
     let _storageMap = cloneDeep(STORAGES_MAP)
-    console.log(`buildCustomStoragesMap _storageMap = ${JSON.stringify(_storageMap)}`)
     let _storage = cloneDeep(storage)
-    console.log(`buildCustomStoragesMap _storage = ${JSON.stringify(_storage)}`)
     merge(_storageMap, _storage)
-    console.log(`buildCustomStoragesMap merged storageMap = ${JSON.stringify(_storageMap)}`)
     return _storageMap
 }
 
@@ -261,10 +253,8 @@ class WebStorage {
      *                                        Fallback storage is intended only for static configurations like 'country', 'lang', 'hasAcceptedCookie'...
      */
     constructor(storageType, storagesMap, fallbackStorage) {
-        console.log(`storagesMap = ${JSON.stringify(storagesMap)}`)
         this.STORAGE_TYPE = storageType
         this.CONTEXT = _getContextByStorageType(storageType)
-        console.log(`this.CONTEXT = ${this.CONTEXT}`)
         this.STORAGES_MAP = cloneDeep(storagesMap) || cloneDeep(STORAGES_MAP)
         this.CAN_USE_STORAGE = this.CONTEXT !== _internalContext ? canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP) : false
         this.USE_FALLBACK_STORAGE = false
@@ -285,13 +275,11 @@ class WebStorage {
             if (this.CONTEXT !== undefined && !isEmpty(this.CONTEXT) && this.CONTEXT !== _internalContext){
                 this.STORAGE = this.STORAGE_TYPE === STORAGE_TYPES.COOKIE ? Object.assign(this.CONTEXT) : Object.assign(this.CONTEXT[storageType])
             } else {
-                console.log('TRY TO SET STORAGE WITH UNDEFINED CONTEXT FROM CUSTOM')
                 this.STORAGE = this.STORAGES_MAP[storageType]
             }
         }
 
         if (this.CAN_USE_STORAGE === false && (get(this.CUSTOM_FALLBACK_STORAGE, 'enabled') === true) || this.CONTEXT === _internalContext){
-            console.log('USE FALLBACK')
             this.USE_FALLBACK_STORAGE = true
         }
     }
