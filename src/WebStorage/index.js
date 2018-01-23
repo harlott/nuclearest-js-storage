@@ -270,18 +270,23 @@ class WebStorage {
         this.USE_FALLBACK_STORAGE = false
         
         this.CUSTOM_FALLBACK_STORAGE = cloneDeep(fallbackStorage)
-        console.log()
         if (this.CAN_USE_STORAGE === false){
-            let callbackOnDisabled = get(this.CUSTOM_FALLBACK_STORAGE, 'callbackOnDisabled')
-            if (callbackOnDisabled !== undefined){
-                callbackOnDisabled()
+            if (this.CUSTOM_FALLBACK_STORAGE !== undefined){
+                let callbackOnDisabled = get(this.CUSTOM_FALLBACK_STORAGE, 'callbackOnDisabled')
+                if (callbackOnDisabled !== undefined){
+                    callbackOnDisabled()
+                }
+            } else {
+                if (this.STORAGES_MAP !== undefined){
+                    this.STORAGE = this.STORAGES_MAP[storageType]
+                }
             }
         } else {
             if (this.CONTEXT !== undefined && !isEmpty(this.CONTEXT) && this.CONTEXT !== _internalContext){
                 this.STORAGE = this.STORAGE_TYPE === STORAGE_TYPES.COOKIE ? Object.assign(this.CONTEXT) : Object.assign(this.CONTEXT[storageType])
             } else {
                 console.log('TRY TO SET STORAGE WITH UNDEFINED CONTEXT FROM CUSTOM')
-                this.STORAGE = storagesMap[storageType]
+                this.STORAGE = this.STORAGES_MAP[storageType]
             }
         }
 
@@ -326,14 +331,14 @@ class WebStorage {
             newParams.push(params[i])
         }
         if (this.USE_FALLBACK_STORAGE === false){
-          newParams.push(Object.assign(this.STORAGE))
-          return this.STORAGES_MAP[this.STORAGE_TYPE][methodName].apply(null, newParams)
-      } else {
-          if (includes(get(this.CUSTOM_FALLBACK_STORAGE, 'grantedProps'), params[0])){
-              newParams.push(_defaultFallbackStoragesMap[_fallbackStorageType])
-              return _defaultFallbackStoragesMap[_fallbackStorageType][methodName].apply(null, newParams)
-          }
-      }
+            newParams.push(Object.assign(this.STORAGE))
+            return this.STORAGES_MAP[this.STORAGE_TYPE][methodName].apply(null, newParams)
+        } else {
+            if (includes(get(this.CUSTOM_FALLBACK_STORAGE, 'grantedProps'), params[0])){
+                newParams.push(_defaultFallbackStoragesMap[_fallbackStorageType])
+                return _defaultFallbackStoragesMap[_fallbackStorageType][methodName].apply(null, newParams)
+            }
+        }
     }
 
     /**
