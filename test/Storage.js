@@ -2,7 +2,7 @@ import WebStorage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, 
 
 const expect = require('chai').expect
 const assert = require('chai').assert
-  let __global__ = {}
+let __global__ = {}
 
 describe('WebStorage', function() {
   let newStorage = buildCustomStorage('fileSystem', (p, v)=>{__global__[p]=v}, (p)=>{return __global__[p]}, (p)=>{__global__[p] = undefined})
@@ -122,12 +122,6 @@ describe('WebStorage', function() {
     })
 
     it('expect set and get a value for localStorage', function(){
-      let _mockedLocalStorage = {
-        setItem: (p, v) => {__global__[p] = v},
-        getItem: (p) => {return __global__[p]},
-        removeItem: (p) => {}
-      }
-      let _storageDisabled = new WebStorage(STORAGE_TYPES.LOCAL_STORAGE, _mockedLocalStorage, undefined)
       storage.setItem('a', 1)
       expect(storage.getItem('a')).to.be.a('number')
     })
@@ -141,6 +135,20 @@ describe('WebStorage', function() {
 
     it('expect get the type', function(){
       expect(storage.getType()).to.be.equal('fileSystem')
+    })
+
+    it('expect storage to be undefined when in fallback mode', function(){
+      expect(storage.getMethod()).to.be.equal(undefined)
+    })
+
+    it('expect work with cookie', function(){
+      global.window = {
+        cookie: ''
+      }
+      let cookieStorage = new WebStorage(STORAGE_TYPES.COOKIE, undefined, {enabled: true})
+      console.log(`cookieStorage.getType() = ${cookieStorage.getType()}`)
+      console.log(`cookieStorage.getMethod() = ${JSON.stringify(cookieStorage.getMethod())}`)
+      expect(cookieStorage.getMethod()).to.have.property('setItem')
     })
 
   })

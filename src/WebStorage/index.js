@@ -225,7 +225,8 @@ const _getContextByStorageType = (storageType) => {
                 return document !== undefined && !isEmpty(document) ? Object.assign(document) : _internalContext
             break
             default:
-                return window !== undefined && !isEmpty(window) ? Object.assign(window) : _internalContext
+                let rs = window !== undefined && !isEmpty(window) ? Object.assign(window) : _internalContext
+                return rs
             break
         }
     } catch (err){
@@ -239,7 +240,7 @@ const _getContextByStorageType = (storageType) => {
 
 /**
  * This is a simple interface for WebStorages.
- * If the selected storage is disabled, Storage provides a default fallback.
+ * If the selected storage is disabled, WebStorage provides a fallback.
  * @type {Storage}
  */
 
@@ -272,11 +273,9 @@ class WebStorage {
                 }
             }
         } else {
-            if (this.CONTEXT !== undefined && !isEmpty(this.CONTEXT) && this.CONTEXT !== _internalContext){
+            if (this.CONTEXT !== undefined && !isEmpty(this.CONTEXT) && this.CONTEXT !== _internalContext && this.CONTEXT !== null){
                 this.STORAGE = this.STORAGE_TYPE === STORAGE_TYPES.COOKIE ? Object.assign(this.CONTEXT) : Object.assign(this.CONTEXT[storageType])
-            } else {
-                this.STORAGE = this.STORAGES_MAP[storageType]
-            }
+            } 
         }
 
         if (this.CAN_USE_STORAGE === false && (get(this.CUSTOM_FALLBACK_STORAGE, 'enabled') === true) || this.CONTEXT === _internalContext){

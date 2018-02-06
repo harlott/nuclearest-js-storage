@@ -3,7 +3,7 @@ import WebStorage, { buildCustomStorage, buildCustomStoragesMap} from '../src/We
 before(function() {
   global.window = {}
   global.navigator = {}
-  global.context = {
+  /*global.context = {
     browser: {
       navigator:{
         userAgent: {
@@ -16,7 +16,7 @@ before(function() {
         userAgent:'node.js'
       }
     }
-  }
+  }*/
   global.__global__ = {}
   global.newStorage = buildCustomStorage('fileSystem', (p, v)=>{global.__global__[p]=v}, (p)=>{return global.__global__[p]}, (p)=>{global.__global__[p] = undefined})
   global.customStoragesMap = buildCustomStoragesMap('fileSystem', global.newStorage)
