@@ -142,13 +142,23 @@ describe('WebStorage', function() {
     })
 
     it('expect work with cookie', function(){
-      global.window = {
+      global.document = {
         cookie: ''
       }
       let cookieStorage = new WebStorage(STORAGE_TYPES.COOKIE, undefined, {enabled: true})
-      console.log(`cookieStorage.getType() = ${cookieStorage.getType()}`)
-      console.log(`cookieStorage.getMethod() = ${JSON.stringify(cookieStorage.getMethod())}`)
-      expect(cookieStorage.getMethod()).to.have.property('setItem')
+      cookieStorage.setItem('test', true)
+      expect(cookieStorage.getItem('test')).to.be.equal(true)
+    })
+    it('expect work with localStorage in right context', function() {
+      global.window = {
+        localStorage: {
+          setItem: () => {},
+          getItem: () => {},
+          removeItem: () => {}
+        }
+      }
+      let windowLocalStorage = new WebStorage(STORAGE_TYPES.LOCAL_STORAGE, undefined, {enabled: true})
+      expect(windowLocalStorage.CAN_USE_STORAGE).to.be.equal(true)
     })
 
   })
