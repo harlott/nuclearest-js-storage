@@ -1,4 +1,4 @@
-# nuclearest-js-storage v1.1.2-alpha
+# nuclearest-js-storage v1.1.3-beta
 
 
 Smart and flexible Web Storage with fallback strategy from [nuclearest-js](https://github.com/harlott/nuclearest-js) 
