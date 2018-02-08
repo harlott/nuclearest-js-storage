@@ -1,4 +1,6 @@
-import WebStorage, { canUseStorage, buildCustomStorage, buildCustomStoragesMap, STORAGE_TYPES } from '../src'
+import WebStorage, { canUseStorage, STORAGE_TYPES } from '../src'
+import buildCustomStorage from '../src/utils/buildCustomStorage'
+import buildCustomStoragesMap from '../src/utils/buildCustomStoragesMap'
 
 const expect = require('chai').expect
 const assert = require('chai').assert

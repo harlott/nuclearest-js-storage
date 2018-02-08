@@ -33,36 +33,12 @@
  *
  */
 
-import { clone, cloneDeep, merge, get, includes, isObject, isEmpty } from 'lodash'
-
-const _parseToStringToSet = (value) => {
-    let parsedValue
-    try {
-        if (isObject(value)){
-            parsedValue = JSON.stringify(value)
-        } else {
-            parsedValue = value
-        }
-        return parsedValue
-    } catch(err) {
-        throw err
-    }
-}
-
-const _parseToObjectToGet = (value) => {
-    let parsedValue
-    try {
-        parsedValue = JSON.parse(value)
-    } catch (err) {
-        if (err instanceof SyntaxError){
-            return value
-        } else {
-            throw err
-        }
-    }
-    return parsedValue
-}
-
+import { cloneDeep, get, includes, isEmpty } from 'lodash'
+import parseToStringToSet from './utils/parseToStringToSet'
+import parseToObjectToGet from './utils/parseToObjectToGet'
+import buildCustomStorage from './utils/buildCustomStorage'
+import buildCustomStoragesMap from './utils/buildCustomStoragesMap'
+import STORAGES_MAP from './utils/storagesMap'
 
 export const STORAGE_TYPES = {
   'LOCAL_STORAGE': 'localStorage',
@@ -109,106 +85,17 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
     return true
 }
 
-const _localOrSessionStorageMap = {
-    setItem: (propertyName, value, expireDate, storage) => {
-        let parsedValue = _parseToStringToSet(value)
-        storage.setItem(propertyName, parsedValue)
-    },
-    getItem: (propertyName, expireDate, storage) => {
-        const item = storage.getItem(propertyName)
-        return _parseToObjectToGet(item)
-        return parsedValue
-    },
-    removeItem: (propertyName, expireDate, storage) => {
-        storage.removeItem(propertyName)
-    }
-}
-
-/**
- * The storages map that implements the WebStorage
- * @type {Object}
- */
-
-const calcExpireDate = () => {
-    let now = new Date();
-    return new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
-}
-
-export const STORAGES_MAP = {
-    localStorage: _localOrSessionStorageMap,
-    sessionStorage: _localOrSessionStorageMap,
-    cookie: {
-        setItem: (propertyName, value, cookieExpiringDate, storage) => {
-            let expires = `expires=${cookieExpiringDate || calcExpireDate()}`
-            let parsedValue = _parseToStringToSet(value)
-
-            storage.cookie = propertyName + "=" + parsedValue + ";" + expires + ";path=/";
-        },
-        getItem: (propertyName, cookieExpiringDate, storage) => {
-            const name = propertyName + "=";
-            const cookieValues = storage.cookie.split(';');
-
-            for(var i = 0; i < cookieValues.length; i++) {
-                var c = cookieValues[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    let item = c.substring(name.length, c.length)
-                    return _parseToObjectToGet(item)
-                }
-            }
-            return "";
-        },
-        removeItem: (propertyName, cookieExpiringDate, storage) => {
-            let expires = `expires=${cookieExpiringDate || calcExpireDate()}`
-            storage.cookie = `${propertyName}=; path=/; ${expires};`
-        }
-    }
-}
-
-/**
- * Build a custom storage object
- * @param  {string} type          The type of storage; i.e: tvFileSystem
- * @param  {Function} setItem    The function to set value in the storage
- * @param  {Function} getItem    The function to get value in the storage
- * @param  {Function} removeItem The function to remove value in the storage
- * @return {Object}               The custom storage map
- */
-export const buildCustomStorage = (type, setItem, getItem, removeItem) => {
-  let _storage = {}
-  _storage[type] = {
-    setItem: setItem,
-    getItem: getItem,
-    removeItem: removeItem
-  }
-  return _storage
-}
-
-/**
- * Build new Storages Map adding custom storages
- * @param  {string} storageType The type of storage; i.e: 'tvFileSystem'
- * @param  {Object} storage     The new storage object
- * @return {Object}             The new storages map
- */
-export const buildCustomStoragesMap = (storageType, storage) => {
-    let _storageMap = cloneDeep(STORAGES_MAP)
-    let _storage = cloneDeep(storage)
-    merge(_storageMap, _storage)
-    return _storageMap
-}
-
 let __storage__fallback__ = {}
 const _internalContext = 'NODE_CONTEXT'
 const _fallbackStorageType = 'fallbackStorage'
 
 const _defaultSetItem = (p, v) => {
-    __storage__fallback__[p] = _parseToStringToSet(v)
+    __storage__fallback__[p] = parseToStringToSet(v)
 }
 
 const _defaultGetItem = (p) => {
     const value = __storage__fallback__[p]
-    return _parseToObjectToGet(value)
+    return parseToObjectToGet(value)
 }
 
 const _defaultRemoveItem = (p) => {

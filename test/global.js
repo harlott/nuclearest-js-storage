@@ -1,4 +1,6 @@
-import WebStorage, { buildCustomStorage, buildCustomStoragesMap} from '../src'
+import WebStorage from '../src'
+import buildCustomStorage from '../src/utils/buildCustomStorage'
+import buildCustomStoragesMap from '../src/utils/buildCustomStoragesMap'
 
 before(function() {
   global.window = {}
