@@ -38,6 +38,9 @@ import parseToStringToSet from './utils/parseToStringToSet'
 import parseToObjectToGet from './utils/parseToObjectToGet'
 import buildCustomStorage from './utils/buildCustomStorage'
 import buildCustomStoragesMap from './utils/buildCustomStoragesMap'
+import tryToUseStorage from './utils/tryToUseStorage'
+import setStorage from './utils/setStorage'
+import getContextByStorageType from './utils/getContextByStorageType'
 import STORAGES_MAP from './utils/storagesMap'
 
 export const STORAGE_TYPES = {
@@ -57,33 +60,10 @@ export const STORAGE_TYPES = {
  * @return {boolean}                        return true if storage is enabled or custom storage is correctly implemented
  */
 
-const setStorage = (storageType, context, customStoragesMap) => {
-    let _storage
-    try {
-        if (context !== undefined || !isEmpty(context)){
-            _storage = storageType === STORAGE_TYPES.COOKIE ? context : context[storageType]
-        } else {
-            _storage = get(customStoragesMap, `${storageType}`)
-        }
-    } catch (error) {
-            throw error
-    }
-    return _storage
-
-}
-
-const tryToUseStorage = (storageType, customStoragesMap, storage) => {
-    let key = 'test'
-    let usedStoragesMap =  customStoragesMap || STORAGES_MAP
-    usedStoragesMap[storageType].setItem(key, '1', undefined, storage);
-    usedStoragesMap[storageType].getItem(key, undefined, storage);
-    usedStoragesMap[storageType].removeItem(key, undefined, storage);
-}
-
 export const canUseStorage = (storageType, context, customStoragesMap) => {
     let _storage
     try {
-        _storage = setStorage(storageType, context, customStoragesMap)
+        _storage = setStorage(storageType, context, customStoragesMap, STORAGE_TYPES)
     } catch (error) {
         if (error instanceof DOMException){
             return false;
@@ -92,7 +72,7 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
         }
     }
     try {
-        tryToUseStorage(storageType, customStoragesMap, _storage)
+        tryToUseStorage(storageType, customStoragesMap, STORAGES_MAP, _storage)
     } catch(err){
         throw err
     }
@@ -119,26 +99,6 @@ const _defaultRemoveItem = (p) => {
 const _defaultFallbackStorage = buildCustomStorage(_fallbackStorageType, _defaultSetItem, _defaultGetItem, _defaultRemoveItem)
 const _defaultFallbackStoragesMap = buildCustomStoragesMap(_fallbackStorageType, _defaultFallbackStorage)
 
-const _getContextByStorageType = (storageType) => {
-    let _context
-    try {
-        switch (storageType){
-            case STORAGE_TYPES.COOKIE:
-                _context = document !== undefined && !isEmpty(document) ? Object.assign(document) : _internalContext
-            break
-            default:
-                _context = window !== undefined && !isEmpty(window) ? Object.assign(window) : _internalContext
-            break
-        }
-    } catch (err){
-        if (!(err instanceof ReferenceError)) {
-            throw err
-        } else {
-            return _internalContext
-        }
-    }
-    return _context
-}
 
 /**
  * This is a simple interface for WebStorages.
@@ -157,7 +117,7 @@ class WebStorage {
      */
     constructor(storageType, storagesMap, fallbackStorage) {
         this.STORAGE_TYPE = storageType
-        this.CONTEXT = _getContextByStorageType(storageType)
+        this.CONTEXT = getContextByStorageType(storageType, STORAGE_TYPES, _internalContext)
         this.STORAGES_MAP = cloneDeep(storagesMap) || cloneDeep(STORAGES_MAP)
         this.CAN_USE_STORAGE = this.CONTEXT !== _internalContext ? canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP) : false
         this.USE_FALLBACK_STORAGE = false
