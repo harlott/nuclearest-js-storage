@@ -38,9 +38,8 @@ import parseToStringToSet from './utils/parseToStringToSet'
 import parseToObjectToGet from './utils/parseToObjectToGet'
 import buildCustomStorage from './utils/buildCustomStorage'
 import buildCustomStoragesMap from './utils/buildCustomStoragesMap'
-import tryToUseStorage from './utils/tryToUseStorage'
-import setStorage from './utils/setStorage'
 import getContextByStorageType from './utils/getContextByStorageType'
+import canUseStorage from './utils/canUseStorage'
 import STORAGES_MAP from './utils/storagesMap'
 
 export const STORAGE_TYPES = {
@@ -49,35 +48,6 @@ export const STORAGE_TYPES = {
   'COOKIE': 'cookie'
 }
 
-/**
- * This method check if storage is disabled and catch the exception.
- * Useful for safari private browsing or browser storage disabled.
- * Check custom storage implementation too.
- *
- * @param  {string} storageType             The type of storage; i.e: STORAGE_TYPES.STORAGE or 'tvFileSystem'
- * @param  {object} context                 The context you are using: window or global
- * @param  {STORAGES_MAP} customStoragesMap The custom storages map
- * @return {boolean}                        return true if storage is enabled or custom storage is correctly implemented
- */
-
-export const canUseStorage = (storageType, context, customStoragesMap) => {
-    let _storage
-    try {
-        _storage = setStorage(storageType, context, customStoragesMap, STORAGE_TYPES)
-    } catch (error) {
-        if (error instanceof DOMException){
-            return false;
-        } else {
-            throw error
-        }
-    }
-    try {
-        tryToUseStorage(storageType, customStoragesMap, STORAGES_MAP, _storage)
-    } catch(err){
-        throw err
-    }
-    return true
-}
 
 let __storage__fallback__ = {}
 const _internalContext = 'NODE_CONTEXT'
@@ -119,7 +89,7 @@ class WebStorage {
         this.STORAGE_TYPE = storageType
         this.CONTEXT = getContextByStorageType(storageType, STORAGE_TYPES, _internalContext)
         this.STORAGES_MAP = cloneDeep(storagesMap) || cloneDeep(STORAGES_MAP)
-        this.CAN_USE_STORAGE = this.CONTEXT !== _internalContext ? canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP) : false
+        this.CAN_USE_STORAGE = this.CONTEXT !== _internalContext ? canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP, STORAGE_TYPES, STORAGES_MAP) : false
         this.USE_FALLBACK_STORAGE = false
         
         this.CUSTOM_FALLBACK_STORAGE = cloneDeep(fallbackStorage)

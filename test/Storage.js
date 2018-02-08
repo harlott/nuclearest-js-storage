@@ -1,4 +1,6 @@
-import WebStorage, { canUseStorage, STORAGE_TYPES } from '../src'
+import WebStorage, { STORAGE_TYPES } from '../src'
+import STORAGES_MAP from '../src/utils/storagesMap'
+import canUseStorage from '../src/utils/canUseStorage'
 import buildCustomStorage from '../src/utils/buildCustomStorage'
 import buildCustomStoragesMap from '../src/utils/buildCustomStoragesMap'
 
@@ -43,13 +45,10 @@ describe('WebStorage', function() {
       } catch (err) {
         assert.ok(true)
       }
-
-
-
     })
 
     it('expect check custom storage', function(){
-      expect(canUseStorage('fileSystem', undefined, customStoragesMap)).to.be.equal(true)
+      expect(canUseStorage('fileSystem', undefined, customStoragesMap, STORAGE_TYPES, STORAGES_MAP)).to.be.equal(true)
     })
 
     it('expect not check standard local storage disabled', function(){
