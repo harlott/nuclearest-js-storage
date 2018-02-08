@@ -57,9 +57,7 @@ export const STORAGE_TYPES = {
  * @return {boolean}                        return true if storage is enabled or custom storage is correctly implemented
  */
 
-export const canUseStorage = (storageType, context, customStoragesMap) => {
-    let key = 'test'
-    let usedStoragesMap =  customStoragesMap || STORAGES_MAP
+const setStorage = (storageType, context, customStoragesMap) => {
     let _storage
     try {
         if (context !== undefined || !isEmpty(context)){
@@ -68,6 +66,25 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
             _storage = get(customStoragesMap, `${storageType}`)
         }
     } catch (error) {
+            throw error
+    }
+    return _storage
+
+}
+
+const tryToUseStorage = (storageType, customStoragesMap, storage) => {
+    let key = 'test'
+    let usedStoragesMap =  customStoragesMap || STORAGES_MAP
+    usedStoragesMap[storageType].setItem(key, '1', undefined, storage);
+    usedStoragesMap[storageType].getItem(key, undefined, storage);
+    usedStoragesMap[storageType].removeItem(key, undefined, storage);
+}
+
+export const canUseStorage = (storageType, context, customStoragesMap) => {
+    let _storage
+    try {
+        _storage = setStorage(storageType, context, customStoragesMap)
+    } catch (error) {
         if (error instanceof DOMException){
             return false;
         } else {
@@ -75,13 +92,10 @@ export const canUseStorage = (storageType, context, customStoragesMap) => {
         }
     }
     try {
-        usedStoragesMap[storageType].setItem(key, '1', undefined, _storage);
-        usedStoragesMap[storageType].getItem(key, undefined, _storage);
-        usedStoragesMap[storageType].removeItem(key, undefined, _storage);       
+        tryToUseStorage(storageType, customStoragesMap, _storage)
     } catch(err){
-       throw err     
+        throw err
     }
-    
     return true
 }
 
@@ -106,14 +120,14 @@ const _defaultFallbackStorage = buildCustomStorage(_fallbackStorageType, _defaul
 const _defaultFallbackStoragesMap = buildCustomStoragesMap(_fallbackStorageType, _defaultFallbackStorage)
 
 const _getContextByStorageType = (storageType) => {
+    let _context
     try {
         switch (storageType){
             case STORAGE_TYPES.COOKIE:
-                return document !== undefined && !isEmpty(document) ? Object.assign(document) : _internalContext
+                _context = document !== undefined && !isEmpty(document) ? Object.assign(document) : _internalContext
             break
             default:
-                let rs = window !== undefined && !isEmpty(window) ? Object.assign(window) : _internalContext
-                return rs
+                _context = window !== undefined && !isEmpty(window) ? Object.assign(window) : _internalContext
             break
         }
     } catch (err){
@@ -123,6 +137,7 @@ const _getContextByStorageType = (storageType) => {
             return _internalContext
         }
     }
+    return _context
 }
 
 /**
