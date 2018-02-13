@@ -33,21 +33,16 @@
  *
  */
 
-import { cloneDeep, get, includes, isEmpty } from 'lodash'
+import { cloneDeep, get, includes, isFunction } from 'lodash'
 import parseToStringToSet from './utils/parseToStringToSet'
 import parseToObjectToGet from './utils/parseToObjectToGet'
 import buildCustomStorage from './utils/buildCustomStorage'
 import buildCustomStoragesMap from './utils/buildCustomStoragesMap'
 import getContextByStorageType from './utils/getContextByStorageType'
 import canUseStorage from './utils/canUseStorage'
+import initStorage from './utils/initStorage'
 import STORAGES_MAP from './utils/storagesMap'
-
-export const STORAGE_TYPES = {
-  'LOCAL_STORAGE': 'localStorage',
-  'SESSION_STORAGE': 'sessionStorage',
-  'COOKIE': 'cookie'
-}
-
+import STORAGE_TYPES from './utils/storageTypes'
 
 let __storage__fallback__ = {}
 const _internalContext = 'NODE_CONTEXT'
@@ -91,28 +86,11 @@ class WebStorage {
         this.STORAGES_MAP = cloneDeep(storagesMap) || cloneDeep(STORAGES_MAP)
         this.CAN_USE_STORAGE = this.CONTEXT !== _internalContext ? canUseStorage(this.STORAGE_TYPE, this.CONTEXT, this.STORAGES_MAP, STORAGE_TYPES, STORAGES_MAP) : false
         this.USE_FALLBACK_STORAGE = false
-        
         this.CUSTOM_FALLBACK_STORAGE = cloneDeep(fallbackStorage)
-        if (this.CAN_USE_STORAGE === false){
-            if (this.CUSTOM_FALLBACK_STORAGE !== undefined){
-                let callbackOnDisabled = get(this.CUSTOM_FALLBACK_STORAGE, 'callbackOnDisabled')
-                if (callbackOnDisabled !== undefined){
-                    callbackOnDisabled()
-                }
-            } else {
-                if (this.STORAGES_MAP !== undefined){
-                    this.STORAGE = this.STORAGES_MAP[storageType]
-                }
-            }
-        } else {
-            if (this.CONTEXT !== undefined && !isEmpty(this.CONTEXT) && this.CONTEXT !== _internalContext && this.CONTEXT !== null){
-                this.STORAGE = this.STORAGE_TYPE === STORAGE_TYPES.COOKIE ? Object.assign(this.CONTEXT) : Object.assign(this.CONTEXT[storageType])
-            } 
-        }
-
-        if (this.CAN_USE_STORAGE === false && (get(this.CUSTOM_FALLBACK_STORAGE, 'enabled') === true) || this.CONTEXT === _internalContext){
-            this.USE_FALLBACK_STORAGE = true
-        }
+        this.STORAGE = initStorage(storageType, this.STORAGES_MAP, this.CONTEXT, _internalContext, this.CAN_USE_STORAGE, this.CUSTOM_FALLBACK_STORAGE)
+        this.USE_FALLBACK_STORAGE = (this.CAN_USE_STORAGE === false && (get(this.CUSTOM_FALLBACK_STORAGE, 'enabled') === true)) || this.CONTEXT === _internalContext
+        let callbackOnDisabled = this.CAN_USE_STORAGE === false && isFunction(get(this.CUSTOM_FALLBACK_STORAGE, 'callbackOnDisabled')) ? get(this.CUSTOM_FALLBACK_STORAGE, 'callbackOnDisabled') : () => {return}
+        callbackOnDisabled()
     }
     /**
      * This method return the storagesType to use on instanciating Storage
@@ -146,7 +124,7 @@ class WebStorage {
 
     use(methodName, params){
         let newParams = []
-        for (let i=0; i <= params.length; i++) {
+        for (let i=0; i <= params.length; i+=1) {
             newParams.push(params[i])
         }
         if (this.USE_FALLBACK_STORAGE === false){

@@ -1,4 +1,5 @@
-import WebStorage, { STORAGE_TYPES } from '../src'
+import WebStorage from '../src'
+import STORAGE_TYPES from '../src/utils/storageTypes'
 import STORAGES_MAP from '../src/utils/storagesMap'
 import canUseStorage from '../src/utils/canUseStorage'
 import buildCustomStorage from '../src/utils/buildCustomStorage'
