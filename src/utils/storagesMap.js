@@ -14,7 +14,6 @@ const _localOrSessionStorageMap = {
     getItem: (propertyName, expireDate, storage) => {
         const item = storage.getItem(propertyName)
         return parseToObjectToGet(item)
-        return parsedValue
     },
     removeItem: (propertyName, expireDate, storage) => {
         storage.removeItem(propertyName)
@@ -41,12 +40,12 @@ const STORAGES_MAP = {
             const name = propertyName + "=";
             const cookieValues = storage.cookie.split(';');
 
-            for(var i = 0; i < cookieValues.length; i++) {
+            for(var i = 0; i < cookieValues.length; i+=1) {
                 var c = cookieValues[i];
-                while (c.charAt(0) == ' ') {
+                while (c.charAt(0) === ' ') {
                     c = c.substring(1);
                 }
-                if (c.indexOf(name) == 0) {
+                if (c.indexOf(name) === 0) {
                     let item = c.substring(name.length, c.length)
                     return parseToObjectToGet(item)
                 }
@@ -61,7 +60,4 @@ const STORAGES_MAP = {
 }
 
 export default STORAGES_MAP
-
-
-
 

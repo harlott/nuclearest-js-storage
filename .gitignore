@@ -8,7 +8,7 @@
 /app/less/*.css
 /ssl
 # Created by https://www.gitignore.io
-
+/lib/*
 .nyc_output/
 mochawesome-report/
 ### Windows ###

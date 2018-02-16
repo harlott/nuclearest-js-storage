@@ -12,8 +12,6 @@ import tryToUseStorage from './tryToUseStorage'
  * @return {boolean}                        return true if storage is enabled or custom storage is correctly implemented
  */
 
-
-
 const canUseStorage = (storageType, context, customStoragesMap, storageTypes, storagesMap) => {
     let _storage
     try {

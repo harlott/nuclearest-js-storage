@@ -1,4 +1,3 @@
-import get from 'lodash/get'
 import isEmpty from 'lodash/isEmpty'
 import STORAGE_TYPES from './storageTypes'
 
@@ -11,7 +10,7 @@ const initStorage = (storageType, storagesMap, context, internalContext, canUseS
     } else {
         if (context !== undefined && !isEmpty(context) && context !== internalContext && context !== null){
             rsStorage = context === STORAGE_TYPES.COOKIE ? Object.assign(context) : Object.assign(context[storageType])
-        } 
+        }
     }
     return rsStorage
 }

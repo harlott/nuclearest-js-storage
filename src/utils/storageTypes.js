@@ -4,5 +4,4 @@ const STORAGE_TYPES = {
     'COOKIE': 'cookie'
 }
 
-export default STORAGE_TYPES 
-  
+export default STORAGE_TYPES
