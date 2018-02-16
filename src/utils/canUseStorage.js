@@ -16,17 +16,13 @@ const canUseStorage = (storageType, context, customStoragesMap, storageTypes, st
     let _storage
     try {
         _storage = setStorage(storageType, context, customStoragesMap, storageTypes)
+        tryToUseStorage(storageType, customStoragesMap, storagesMap, _storage)
     } catch (error) {
         if (error instanceof DOMException){
             return false;
         } else {
             throw error
         }
-    }
-    try {
-        tryToUseStorage(storageType, customStoragesMap, storagesMap, _storage)
-    } catch(err){
-        throw err
     }
     return true
 }
