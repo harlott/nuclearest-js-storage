@@ -1,5 +1,6 @@
 import parseToStringToSet from './parseToStringToSet'
 import parseToObjectToGet from './parseToObjectToGet'
+import cookie from 'cookie'
 
 const calcExpireDate = () => {
     let now = new Date();
@@ -32,9 +33,8 @@ const STORAGES_MAP = {
     cookie: {
         setItem: (propertyName, value, cookieExpiringDate, storage) => {
             let expires = `expires=${cookieExpiringDate || calcExpireDate()}`
-            let parsedValue = parseToStringToSet(value)
-
-            storage.cookie = propertyName + "=" + parsedValue + ";" + expires + ";path=/";
+            let serializeOptions =  {expires: cookieExpiringDate || calcExpireDate(), path: ";path=/"}
+            storage.cookie = cookie.serialize(propertyName, value, serializeOptions);
         },
         getItem: (propertyName, cookieExpiringDate, storage) => {
             const name = propertyName + "=";
