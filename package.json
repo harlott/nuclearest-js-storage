@@ -35,7 +35,7 @@
     "autoprefixer": "^7.2.3",
     "autoprefixer-loader": "^3.2.0",
     "babel-cli": "^6.11.4",
-    "babel-core": "^6.22.1",
+    "babel-core": "^6.26.3",
     "babel-eslint": "^8.0.3",
     "babel-loader": "^7.1.2",
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -58,14 +58,14 @@
     "fs-extra": "^5.0.0",
     "jsdoc": "^3.5.5",
     "mocha": "^4.0.1",
-    "nyc": "^11.3.0",
+    "nyc": "^13.2.0",
     "scripty": "^1.7.0",
     "transform-runtime": "0.0.0",
     "webpack": "^3.10.0"
   },
   "dependencies": {
     "cookie": "^0.3.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "require": "^2.4.20"
   },
   "nyc": {
